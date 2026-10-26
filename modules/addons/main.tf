@@ -61,7 +61,6 @@ resource "helm_release" "aws_load_balancer_controller" {
 }
 
 # 3. Parse 2048-game.yaml documents with static keys at plan time
-# This avoids data.kubectl_file_documents which causes "known only after apply" error with module depends_on
 locals {
   raw_manifests = [
     for doc in split("---", file(var.manifest_path)) : trimspace(doc) if trimspace(doc) != ""
