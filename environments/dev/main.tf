@@ -188,11 +188,12 @@ provider "kubectl" {
 
 # 7. Automated Addons & Application Deployment
 module "addons" {
-  source        = "../../modules/addons"
-  cluster_name  = module.eks.cluster_name
-  aws_region    = var.aws_region
-  vpc_id        = module.vpc.vpc_id
-  manifest_path = "${path.module}/../../2048-game.yaml"
-
+  source              = "../../modules/addons"
+  cluster_name        = module.eks.cluster_name
+  aws_region          = var.aws_region
+  vpc_id              = module.vpc.vpc_id
+  git_repo_url        = var.git_repo_url
+  git_target_revision = var.git_target_branch
+  kubernetes_deployment_file_name = var.kubernetes_deployment_file_name
   depends_on = [module.asg]
 }

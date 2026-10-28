@@ -13,7 +13,17 @@ variable "vpc_id" {
   description = "VPC ID where EKS is hosted"
 }
 
-variable "manifest_path" {
+variable "git_repo_url" {
   type        = string
-  description = "Absolute or relative path to 2048-game.yaml"
+  description = "git repo url"
+}
+
+variable "git_target_revision" {
+  type        = string
+  description = "git repo target revision"
+}
+
+variable "kubernetes_deployment_file_name" {
+  type        = string
+  description = "kubernetes deployment file name"
 }

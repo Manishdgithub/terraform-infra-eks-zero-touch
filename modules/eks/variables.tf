@@ -1,26 +1,26 @@
 variable "environment" {
-  type = string
+  type        = string
   description = "Deployment environment identifier"
 }
 
 variable "cluster_name" {
-  type = string
+  type        = string
   description = "Deployment cluster name"
 }
 
 variable "cluster_version" {
-  type    = string
-  default = "1.30"
+  type        = string
+  default     = "1.30"
   description = "Deployment cluster version"
 }
 
 variable "private_subnet_ids" {
-  type = list(string)
+  type        = list(string)
   description = "Deployment private subnet ids"
 }
 
 variable "cluster_security_group_id" {
-  type = string
+  type        = string
   description = "Deployment cluster security group id"
 }
 

@@ -15,7 +15,7 @@ terraform {
   }
 }
 
-# 1. Plain ServiceAccount for the AWS Load Balancer Controller in kube-system
+# 1. AWS Load Balancer Controller Service Account
 resource "kubernetes_service_account" "lbc_sa" {
   metadata {
     name      = "aws-load-balancer-controller"
@@ -60,20 +60,53 @@ resource "helm_release" "aws_load_balancer_controller" {
   }
 }
 
-# 3. Parse 2048-game.yaml documents with static keys at plan time
-locals {
-  raw_manifests = [
-    for doc in split("---", file(var.manifest_path)) : trimspace(doc) if trimspace(doc) != ""
-  ]
-  manifest_map = {
-    for idx, doc in local.raw_manifests : tostring(idx) => doc
+# 3. Deploy Argo CD via Helm (Creates and manages 'argocd' namespace natively)
+resource "helm_release" "argocd" {
+  name             = "argo-cd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
+  create_namespace = true
+  version          = "7.7.0"
+
+  wait    = true
+  timeout = 600
+
+  set {
+    name  = "server.service.type"
+    value = "ClusterIP"
   }
 }
 
-resource "kubectl_manifest" "app_resources" {
-  for_each  = local.manifest_map
-  yaml_body = each.value
+# 4. Declarative GitOps Application CRD (Finalizer removed for clean teardown)
+resource "kubectl_manifest" "argocd_git_application" {
+  yaml_body = <<-YAML
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: game-2048
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: '${var.git_repo_url}'
+        targetRevision: '${var.git_target_revision}'
+        path: '.'
+        directory:
+          include: '${var.kubernetes_deployment_file_name}'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: game-2048
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+  YAML
 
-  # Ensures controller pods are installed and running before the ingress is processed
-  depends_on = [helm_release.aws_load_balancer_controller]
+  depends_on = [
+    helm_release.argocd,
+    helm_release.aws_load_balancer_controller
+  ]
 }

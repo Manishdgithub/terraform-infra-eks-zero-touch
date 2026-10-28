@@ -52,3 +52,18 @@ variable "desired_capacity" {
   type        = number
   description = "Target ASG instance capacity"
 }
+
+variable "git_repo_url" {
+  type        = string
+  description = "git repo url"
+}
+
+variable "git_target_branch" {
+  type        = string
+  description = "git repo target revision"
+}
+
+variable "kubernetes_deployment_file_name" {
+  type        = string
+  description = "kubernetes deployment file name"
+}

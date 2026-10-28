@@ -10,5 +10,5 @@ output "instance_security_group_id" {
 
 output "eks_cluster_security_group_id" {
   description = "The security group ID attached to the eks cluster"
-  value = aws_security_group.eks_cluster_sg.id
+  value       = aws_security_group.eks_cluster_sg.id
 }

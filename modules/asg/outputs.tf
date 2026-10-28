@@ -9,6 +9,6 @@ output "asg_name" {
 }
 
 output "node_role_arn" {
-  value = aws_iam_role.node.arn
+  value       = aws_iam_role.node.arn
   description = "The Auto Scaling node role arn"
 }
